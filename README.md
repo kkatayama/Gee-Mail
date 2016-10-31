@@ -12,6 +12,7 @@ A secure asynchronous (same-machine) message platform
 #osx
 >###Install Libraries
 >brew install boost
+
 >brew install cryptopp
 
 >###Complie
