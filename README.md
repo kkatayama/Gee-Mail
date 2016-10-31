@@ -10,11 +10,10 @@ A secure asynchronous (same-machine) message platform
 >g++ -g3 -ggdb -O0 -DDEBUG -I/usr/include/cryptopp *.cpp sha256/*.cpp -o gee-mail -lcryptopp -lpthread
 
 #osx
-###Install Libraries
-brew install boost
-brew install cryptopp
+>###Install Libraries
+>brew install boost
+>brew install cryptopp
 
-###Complie
-g++ -I/usr/local/include/cryptopp *.cpp sha256/*.cpp -o gee-mail
-g++ -g3 -ggdb -O0 -DDEBUG -I/usr/local/include/cryptopp *.cpp sha256/*.cpp -o gee-mail -lcryptopp -lpthread
+>###Complie
+>g++ -g3 -ggdb -O0 -DDEBUG -I/usr/local/include/cryptopp *.cpp sha256/*.cpp -o gee-mail -lcryptopp -lpthread
 
