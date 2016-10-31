@@ -7,7 +7,7 @@ A secure asynchronous (same-machine) message platform
 >sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils
 
 >###Compile
->g++ -g3 -ggdb -O0 -DDEBUG -I/usr/include/cryptopp \*.cpp sha256/\*.cpp -o gee-mail -lcryptopp -lpthread
+>g++ -Wall -I/usr/include/cryptopp -o gee-mail \*.cpp sha256/\*.cpp -lcryptopp
 
 #osx
 >###Install Libraries
@@ -15,5 +15,5 @@ A secure asynchronous (same-machine) message platform
 >brew install cryptopp
 
 >###Complie
->g++ -g3 -ggdb -O0 -DDEBUG -I/usr/local/include/cryptopp \*.cpp sha256/\*.cpp -o gee-mail -lcryptopp -lpthread
+>g++ -Wall -I/usr/local/include/cryptopp -o gee-mail \*.cpp sha256/\*.cpp -lcryptopp
 
