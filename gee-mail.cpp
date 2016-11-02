@@ -16,11 +16,18 @@ int main (int argc, char* argv[]) {
   string *cipherdata = new string[3];
   string recovered;
 
+   cout << "Content-type:text/html\r\n\r\n";
+   cout << "<html>\n";
+   cout << "<head>\n";
+   cout << "<title>Hello World - First CGI Program</title>\n";
+   cout << "</head>\n";
+   cout << "<body>\n";
+
   // TEST SHA-256
   string test = sha256("0" + sha256("hundreds"));
   string ans = "A8677DF7AAC4E90428D7226C5D28971273A5DDDB2F0338C963ACC521A6232934";
   string test2 = secure_hash("hundreds","",1);
-
+  
   cout << "test    : " << test << endl;
   cout << "ans     : " << ans << endl;
   cout << "test2   : " << test2 << endl;
@@ -66,5 +73,10 @@ int main (int argc, char* argv[]) {
     cout << "\t" << pw << endl;
     
   }
+  
+   cout << "<h2>Hello World! This is my first CGI program</h2>\n";
+   cout << "</body>\n";
+   cout << "</html>\n";
+  
   return 0;  
 }
