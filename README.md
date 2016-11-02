@@ -28,20 +28,24 @@ string secure_hash(string secret, string salt, int stretch);
 ```
 >returns sha256 string
 
+
 ```c++
 string* encrypt(string plaintext, string passphrase);
 ```
 >returns AES-256 encrypted string array [iv, key, ciphertext]
+
 
 ```c++
 string decrypt(string ciphertext, string key, string iv);
 ```
 >returns plaintext string
 
+
 ```c++
 database db("<DATABASE_NAME>");
 ```
 >connects to sqlite3 database
+
 
 ```c++
 command cmd(db, "INSERT INTO users (username, password) VALUES (:username, :password)");
@@ -50,6 +54,7 @@ cmd.bind(":password", password, nocopy);
 cmd.execute();
 ```
 >executes db query with bind parameters
+
 
 ```c++
 query qry(db, "SELECT password FROM users WHERE username = :user");
