@@ -1,15 +1,10 @@
 #include <iostream>
-#include <iostream>
-#include <stdio.h>
-#include <cstdlib>
-#include <string>
 #include "aes.h"
 #include "hex.h"
 #include "modes.h"
 #include "osrng.h"
 #include "sha256.h"
 #include "filters.h"
-#include "cryptlib.h"
 #include "cryptogm.h"
 
 using namespace std;
