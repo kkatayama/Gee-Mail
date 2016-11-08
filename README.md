@@ -5,10 +5,9 @@ A secure asynchronous (same-machine) message platform
 #ubuntu (cloud 9)
 >###Install Libraries
 >sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils<br >
->sudo apt-get install build-essential libcgicc5 libcgicc5-dev libcgicc-doc
 
 >###Compile
->g++ -std=c++11 -I/usr/include/cryptopp \*.cpp cryptogm/\*.cpp -lcryptopp -lsqlite3 -lcgicc -o cgi-bin/gee-mail.cgi
+>g++ -std=c++11 -I/usr/include/cryptopp \*.cpp cryptogm/\*.cpp -lcryptopp -lsqlite3 -o gee-mail
 
 #osx
 >###Install Libraries
