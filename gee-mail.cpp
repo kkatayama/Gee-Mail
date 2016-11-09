@@ -47,6 +47,23 @@ vector <string> getSenders(string receiver) {
 
   return senders;
 }
+
+vector <string> getMessages(string receiver) {
+  database db("gee-mail.db");
+  vector <string> senders;
+
+  query qry(db, "SELECT DISTINCT sender FROM messages WHERE receiver = :user");
+  qry.bind(":user", receiver, nocopy);
+  for (auto v : qry) {
+    string sender = "";
+    v.getter() >> sender;
+    senders.push_back(sender);
+  }
+
+  return senders;
+}
+
+
 string getTime() {
   time_t currentTime = time(0);
   string datetime = asctime(localtime(&currentTime));
@@ -55,7 +72,7 @@ string getTime() {
   return datetime;
 }
 
-void writeMessage(string username, string receiver, string message, string timestamp, string passphrase) {
+void writeMessage(string username, string receiver, string message, string timestamp, string title, string passphrase) {
   database db("gee-mail.db");
   string *cipherdata = new string[3];
   string ciphertext;
@@ -68,13 +85,21 @@ void writeMessage(string username, string receiver, string message, string times
   key = cipherdata[1];
   iv = cipherdata[0];
 
-  command cmd(db, "INSERT INTO messages (sender, receiver, message, timestamp, passphrase) VALUES (:send, :rcv, :msg, :time, :pass)");
+  command cmd(db, "INSERT INTO messages (sender, receiver, message, timestamp, passphrase) VALUES (:send, :rcv, :msg, :time, :ttl, :pass)");
   cmd.bind(":send", username, nocopy);
   cmd.bind(":rcv", receiver, nocopy);
   cmd.bind(":msg", iv+ciphertext, nocopy);
   cmd.bind(":time", timestamp, nocopy);
+  cmd.bind(":ttl", title, nocopy);
   cmd.bind(":pass", passphrase, nocopy);
   cmd.execute();
+}
+
+bool checkSender(string send) {
+  database db("gee-mail.db");
+  
+  
+  return false;
 }
 
 bool check_password(string pass){
@@ -96,6 +121,18 @@ bool check_password(string pass){
     return false;
   }
   return true;
+}
+
+int getChoice(){
+  int x = 0;
+
+  while(!(cin >> x)){
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    cout << "Invalid input.  Try again: ";    
+  }
+
+  return x; 
 }
 
 int main (int argc, char* argv[]) {
@@ -229,21 +266,49 @@ int main (int argc, char* argv[]) {
   /***************************/
   choice = "";
   string receiver   = "";
+  string title      = "";
   string message    = "";
   string passphrase = "";
   string timestamp  = "";
+  int senderChoice;
   int i;
   int writeCount;
   int messageCount = 0;
   vector <string> senders;
+  vector <string> messages;
   
   while(logged_in) {
     if(!choice.compare("1")) { // User chooses to READ MESSAGE
+      senders = getSenders(username);
+      gfx.clearScreen();
+
+      check = false;
+      while (check == false) {
+        cout << "+-----------------------------------------------+" << endl;
+        cout << "| GeeMail Messaging Platform: Reading a message |" << endl;
+        cout << "+-----------------------------------------------+" << endl;
+        for (int i = 0; i < senders.size(); i++) {
+          cout << " [" << i << "]" << senders[i] << endl;
+        }      
+        cout << "+-----------------------------------------------+" << endl;
+        cout << "Which user would you like to read a message from?" << endl;
+        cout << ": ";
+        // getline(cin, senderChoice);
+        senderChoice = getChoice();
+
+        if ((senderChoice > senders.size()) || (senderChoice < 1)) {
+          cout << "+-----------------------------------------------+" << endl;
+          cout << " Messages from: " << senders[i] << endl;
+          cout << "+-----------------------------------------------+" << endl;
+          messages = getMessages();
+        }
+      }
+      
       
     } else if (!choice.compare("2")) { // User chooses to WRITE MESSAGE
       writeCount = 0;
 
-      for (i = 0; i < 4; i++) {
+      for (i = 0; i < 5; i++) {
         gfx.clearScreen();
         cout << "+-----------------------------------------------+" << endl;
         cout << "| GeeMail Messaging Platform: Writing a message |" << endl;
@@ -253,22 +318,29 @@ int main (int argc, char* argv[]) {
           cout << "Enter Recepient: ";
           getline(cin, receiver);
         } else if (i == 1) {
-          cout << "|  Recepient: "<< receiver << endl;
+          cout << "|  Recepient: " << receiver << endl;
+          cout << "Enter a title for your message: ";
+          getline(cin, title);
+        } else if (i == 2) {
+          cout << "|  Recepient: " << receiver << endl;
+          cout << "|      title: " << title << endl;
           cout << "Enter your message: ";
           getline(cin, message);
-        } else if (i == 2){
-          cout << "|  Recepient: "<< receiver << endl;
-          cout << "|    message: "<< message << endl;
+        } else if (i == 3){
+          cout << "|  Recepient: " << receiver << endl;
+          cout << "|      title: " << title << endl;
+          cout << "|    message: " << message << endl;
           cout << "Enter a passphrase: ";
           getline(cin, passphrase);
         } else {
           timestamp = getTime();
           cout << "|  Recepient: " << receiver << endl;
+          cout << "|      title: " << title << endl;
           cout << "|    message: " << message << endl;
           cout << "| passphrase: " << passphrase << endl;
           cout << "|  timestamp: " << timestamp << endl;
 
-          writeMessage(username, receiver, message, timestamp, passphrase);
+          writeMessage(username, receiver, title, message, timestamp, passphrase);
           cout << "\nMessage successfully written." << endl;
           cout << "Please remember your passphrase." << endl;
           cout << "\nPress Enter to return to main menu...\n";
@@ -285,7 +357,7 @@ int main (int argc, char* argv[]) {
       cout << "You have " << messageCount << " messages from the following users" << endl;
       cout << "-----------------------" << endl;
       for (int i = 0; i < senders.size(); i++) {
-        cout << "[" << (i+1) << "] " << senders[i] << endl;
+        cout << "  " << senders[i] << endl;
       }    
       cout << "-----------------------" << endl;
       cout << "\nWould you like to read or write a message?" << endl;
