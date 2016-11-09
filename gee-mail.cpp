@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <thread>
+#include <chrono>
 #include "GraphicEngine.h"
 #include "cryptogm/sha256.h"
 #include "cryptogm/cryptogm.h"
@@ -136,6 +138,88 @@ int getChoice(){
   return x; 
 }
 
+bool userLogin(string username, string pass) {
+  int attempts;
+  string tmp = "";
+  database db("gee-mail.db");
+  
+  query qry(db, "SELECT username, password FROM users WHERE username = :user and password = :pass");
+  qry.bind(":user", username, nocopy);
+  qry.bind(":pass", pass, nocopy);
+
+  // if there is no response, then password failed
+  // increment number of attempts for that user if that user exists in database
+  if (qry.begin() == qry.end()) {
+    cout << "bad credentials" << endl;
+    query qry(db, "SELECT attempts FROM users WHERE username = :user");
+    qry.bind(":user", username, nocopy);
+          
+    for (auto v : qry) {
+      tmp = "";
+      v.getter() >> tmp;
+      attempts = stoi(tmp);
+      attempts++;
+      command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
+      cmd.bind(":attempt", to_string(attempts), nocopy);
+      cmd.bind(":user", username, nocopy);
+      cmd.execute();
+    }          
+  }
+  // username and password match, check to make sure account is not locked
+  else {
+    query qry(db, "SELECT attempts FROM users WHERE username = :user and password = :pass");
+    qry.bind(":user", username, nocopy);
+    qry.bind(":pass", pass, nocopy);
+
+    for (auto v : qry) {
+      tmp = "";
+      v.getter() >> tmp;
+      attempts = stoi(tmp);
+      if (attempts < 3) {
+        cout << "success..." << endl;
+        this_thread::sleep_for (std::chrono::seconds(1));
+        return true;
+      } else {
+        cout << "UserName: " << username << " is locked" << endl;
+        cout << "Please contact the system administrator to unlock the account" << endl;
+      }
+    }
+  }
+  this_thread::sleep_for (std::chrono::seconds(3));
+  return false;
+}
+
+int userRegister(string username, string password) {
+  // return 0: success
+  // return 1: username exists
+  // return 2: password too weak
+  bool check;
+  database db("gee-mail.db");
+  
+  query qry(db, "SELECT username FROM users WHERE username = :user");
+  qry.bind(":user", username, nocopy);
+  if (qry.begin() != qry.end()) {
+    cout << "## username is taken ##" << endl;
+    return 1;
+  }
+      
+
+  check = check_password(password);
+  if (check == false) 
+    return 2;
+
+  password = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
+  command cmd(db, "INSERT INTO users (username, password, attempts) VALUES (:username, :password, :attempts)");
+  cmd.bind(":username", username, nocopy);
+  cmd.bind(":password", password, nocopy);
+  cmd.bind(":attempts", "0", nocopy);
+  cmd.execute();
+      
+  cout << "user created!"<< endl;
+  this_thread::sleep_for (std::chrono::seconds(1));
+  return 0;
+}
+
 int main (int argc, char* argv[]) {
   database db("gee-mail.db");
   GraphicEngine gfx;
@@ -143,11 +227,9 @@ int main (int argc, char* argv[]) {
   string password = "";
   string choice = "";
   string pass = "";
-  string tmp = "";
   bool logged_in;
   bool check;
-  int attempts;
-  int count;
+  int checkRegister;
 
   /********************************/
   /* Login or Register a New User */
@@ -158,98 +240,29 @@ int main (int argc, char* argv[]) {
       gfx.clearScreen();
       cout << "Welcome to the Gee-Mail Login Page" << endl;
 
-      count = 0;
-      check = false;
-      while(!check) {
-        cout << "username: ";
-        getline(cin, username);
-        password = getpass("password: ");
-        pass = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
+      cout << "username: ";
+      getline(cin, username);
+      password = getpass("password: ");
+      pass = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
 
-        query qry(db, "SELECT username, password FROM users WHERE username = :user and password = :pass");
-        qry.bind(":user", username, nocopy);
-        qry.bind(":pass", pass, nocopy);
-
-        // if there is no response, then password failed
-        // increment number of attempts for that user if that user exists in database
-        if (qry.begin() == qry.end()) {
-          cout << "bad credentials" << endl;
-          query qry(db, "SELECT attempts FROM users WHERE username = :user");
-          qry.bind(":user", username, nocopy);
-          
-          for (auto v : qry) {
-            tmp = "";
-            v.getter() >> tmp;
-            attempts = stoi(tmp);
-            attempts++;
-            command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
-            cmd.bind(":attempt", to_string(attempts), nocopy);
-            cmd.bind(":user", username, nocopy);
-            cmd.execute();
-          }          
-          count++;
-        }
-        // username and password match, check to make sure account is not locked
-        else {
-          query qry(db, "SELECT attempts FROM users WHERE username = :user and password = :pass");
-          qry.bind(":user", username, nocopy);
-          qry.bind(":pass", pass, nocopy);
-
-          for (auto v : qry) {
-            tmp = "";
-            v.getter() >> tmp;
-            attempts = stoi(tmp);
-            if (attempts < 3) {
-              cout << "Logged in..." << endl;
-              logged_in = true;
-              check = true;
-            } else {
-              cout << "UserName: " << username << " is locked" << endl;
-              cout << "Please contact the system administrator to unlock the account" << endl;
-            }
-          }
-        }
-        if (count > 2) {
-          check = true;
-          choice = "";
-        }
-      }
+      logged_in = userLogin(username, pass);
+      choice = "";
       
     } else if (!choice.compare("2")) { // User chooses to REGISTER
       // Register
       gfx.clearScreen();
       cout << "Welcome to the Gee-Mail Registration Form" << endl;
-      
-      check = false;
-      while (check == false) {
-        cout << "Enter a username: ";
-        getline(cin, username);
-        
-        query qry(db, "SELECT username FROM users WHERE username = :user");
-        qry.bind(":user", username, nocopy);
-        if (qry.begin() == qry.end()) {
-          check = true;
-        } else {
-          cout << "## username is taken ##" << endl; 
+
+      checkRegister = 1;
+      while (checkRegister) {
+        if (checkRegister < 2) {
+          cout << "Enter a username: ";
+          getline(cin, username);
         }
-      }
-      
-      check = false;
-      while (check == false) {
-        //cout << "Enter a password: ";
-        //cin >> password;
         password = getpass("Enter a password: ");
-        check = check_password(password);
-        choice = "";
+        checkRegister = userRegister(username, password);
       }
-      password = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
-      command cmd(db, "INSERT INTO users (username, password, attempts) VALUES (:username, :password, :attempts)");
-      cmd.bind(":username", username, nocopy);
-      cmd.bind(":password", password, nocopy);
-      cmd.bind(":attempts", "0", nocopy);
-      cmd.execute();
-      
-      cout << "user created!"<< endl;
+      choice = "";
       
     } else {
       gfx.printIntro(); // Display Program Info
@@ -302,6 +315,7 @@ int main (int argc, char* argv[]) {
           cout << " Messages from: " << senders[i] << endl;
           cout << "+-----------------------------------------------+" << endl;
           messages = getMessages(username);
+          
         }
       }
       
