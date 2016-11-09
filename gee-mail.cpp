@@ -72,7 +72,7 @@ string getTime() {
   return datetime;
 }
 
-void writeMessage(string username, string receiver, string message, string timestamp, string title, string passphrase) {
+void writeMessage(string username, string receiver, string title, string message, string writetime, string readtime, string passphrase) {
   database db("gee-mail.db");
   string *cipherdata = new string[3];
   string ciphertext;
@@ -85,12 +85,13 @@ void writeMessage(string username, string receiver, string message, string times
   key = cipherdata[1];
   iv = cipherdata[0];
 
-  command cmd(db, "INSERT INTO messages (sender, receiver, message, timestamp, passphrase) VALUES (:send, :rcv, :msg, :time, :ttl, :pass)");
+  command cmd(db, "INSERT INTO messages (sender, receiver, title, message, writetime, readtime, passphrase) VALUES (:send, :rcv, :ttl, :msg, :write, :read, :pass)");
   cmd.bind(":send", username, nocopy);
   cmd.bind(":rcv", receiver, nocopy);
-  cmd.bind(":msg", iv+ciphertext, nocopy);
-  cmd.bind(":time", timestamp, nocopy);
   cmd.bind(":ttl", title, nocopy);
+  cmd.bind(":msg", iv+ciphertext, nocopy);
+  cmd.bind(":write", writetime, nocopy);
+  cmd.bind(":read", readtime, nocopy);
   cmd.bind(":pass", passphrase, nocopy);
   cmd.execute();
 }
@@ -300,7 +301,7 @@ int main (int argc, char* argv[]) {
           cout << "+-----------------------------------------------+" << endl;
           cout << " Messages from: " << senders[i] << endl;
           cout << "+-----------------------------------------------+" << endl;
-          messages = getMessages();
+          messages = getMessages(username);
         }
       }
       
@@ -340,7 +341,7 @@ int main (int argc, char* argv[]) {
           cout << "| passphrase: " << passphrase << endl;
           cout << "|  timestamp: " << timestamp << endl;
 
-          writeMessage(username, receiver, title, message, timestamp, passphrase);
+          writeMessage(username, receiver, title, message, timestamp, "0", passphrase);
           cout << "\nMessage successfully written." << endl;
           cout << "Please remember your passphrase." << endl;
           cout << "\nPress Enter to return to main menu...\n";
