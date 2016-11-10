@@ -29,13 +29,14 @@ void GraphicEngine::clearScreen()
 void GraphicEngine::printIntro()
 {
    GraphicEngine::clearScreen();
-   cout << "*************************************************" << endl;
-   cout << "* CPEG-676 Secure Systems: Project 4: Gee-Mail  *" << endl;
-   cout << "******************* Authors *********************" << endl;
-   cout << "* Alparslan Sari                                *" << endl;
-   cout << "* Kaoru (Teddy) Katayama                        *" << endl;
-   cout << "* Pengcheng (Kevin) Zhou                        *" << endl;
-   cout << "*************************************************" << endl;
+            +-------------------------------------------------------------------------------+
+   cout << "*********************************************************************************" << endl;
+   cout << "* CPEG-676 Secure Systems: Project 4: Gee-Mail                                  *" << endl;
+   cout << "*********************************** Authors *************************************" << endl;
+   cout << "* Alparslan Sari                                                                *" << endl;
+   cout << "* Kaoru (Teddy) Katayama                                                        *" << endl;
+   cout << "* Pengcheng (Kevin) Zhou                                                        *" << endl;
+   cout << "*********************************************************************************" << endl;
 }
 
 
