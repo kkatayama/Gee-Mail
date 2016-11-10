@@ -82,7 +82,7 @@ vector <string> getMessages(string sender, string receiver)
 ```c++
 string getMessage(string messageid);
 ```
->returns string of a message given its id
+>returns a tab-delimited ("\t") string of a message given its id
 
 ```c++
 writeMessage(string username, string receiver, string title, string message, string writetime, string readtime, string passphrase);
