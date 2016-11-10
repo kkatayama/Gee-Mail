@@ -1,5 +1,4 @@
 #include <boost/algorithm/string.hpp>
-// #include <sqlite3.h>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -23,6 +22,139 @@ using namespace boost;
 using namespace CryptoPP;
 using namespace sqlite3pp;
 
+// Helper Functions
+
+string getTime() {
+  time_t currentTime = time(0);
+  string datetime = asctime(localtime(&currentTime));
+  datetime.erase(remove(datetime.begin(), datetime.end(), '\n'), datetime.end());
+
+  return datetime;
+}
+
+int getChoice(){
+  int x = 0;
+
+  while(!(cin >> x)){
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    cout << "Invalid input.  Try again\n: ";    
+  }
+  return x; 
+}
+
+// Login and Registration
+
+bool check_password(string pass){
+  vector <string> passwords;
+  ifstream passfile;
+  string pw;
+
+  passfile.open("cryptogm/top_1000000.txt");
+  while (getline (passfile, pw)) {
+    passwords.push_back(pw);
+  }
+    
+  if (find(passwords.begin(), passwords.end(), pass) != passwords.end()) {
+    cout << "common password, please use a unique password" << endl;
+    return false;
+  }
+  if (pass.length() < 6) {
+    cout << "password too short" << endl;
+    return false;
+  }
+  return true;
+}
+
+int userRegister(string username, string password) {
+  // return 0: success
+  // return 1: username exists
+  // return 2: password too weak
+  bool check;
+  database db("gee-mail.db");
+  
+  query qry(db, "SELECT username FROM users WHERE username = :user");
+  qry.bind(":user", username, nocopy);
+  if (qry.begin() != qry.end()) {
+    cout << "## username is taken ##" << endl;
+    return 1;
+  }
+      
+
+  check = check_password(password);
+  if (check == false) 
+    return 2;
+
+  password = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
+  command cmd(db, "INSERT INTO users (username, password, attempts) VALUES (:username, :password, :attempts)");
+  cmd.bind(":username", username, nocopy);
+  cmd.bind(":password", password, nocopy);
+  cmd.bind(":attempts", "0", nocopy);
+  cmd.execute();
+      
+  cout << "user created!"<< endl;
+  this_thread::sleep_for (std::chrono::seconds(1));
+  return 0;
+}
+
+bool userLogin(string username, string password) {
+  int attempts;
+  string tmp = "";
+  database db("gee-mail.db");
+  string pass = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
+  
+  query qry(db, "SELECT username, password FROM users WHERE username = :user and password = :pass");
+  qry.bind(":user", username, nocopy);
+  qry.bind(":pass", pass, nocopy);
+
+  // if there is no response, then password failed
+  // increment number of attempts for that user if that user exists in database
+  if (qry.begin() == qry.end()) {
+    cout << "bad credentials" << endl;
+    query qry(db, "SELECT attempts FROM users WHERE username = :user");
+    qry.bind(":user", username, nocopy);
+          
+    for (auto v : qry) {
+      tmp = "";
+      v.getter() >> tmp;
+      attempts = stoi(tmp);
+      attempts++;
+      command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
+      cmd.bind(":attempt", to_string(attempts), nocopy);
+      cmd.bind(":user", username, nocopy);
+      cmd.execute();
+    }          
+  }
+  // username and password match, check to make sure account is not locked
+  else {
+    query qry(db, "SELECT attempts FROM users WHERE username = :user and password = :pass");
+    qry.bind(":user", username, nocopy);
+    qry.bind(":pass", pass, nocopy);
+
+    for (auto v : qry) {
+      tmp = "";
+      v.getter() >> tmp;
+      attempts = stoi(tmp);
+      if (attempts < 3) {
+        command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
+        cmd.bind(":attempt", "0", nocopy);
+        cmd.bind(":user", username, nocopy);
+        cmd.execute();
+        cout << "success..." << endl;
+        this_thread::sleep_for (std::chrono::seconds(1));
+        return true;
+      } else {
+        cout << "UserName: " << username << " is locked" << endl;
+        cout << "Please contact the system administrator to unlock the account" << endl;
+      }
+    }
+  }
+  this_thread::sleep_for (std::chrono::seconds(3));
+  return false;
+}
+
+// Read, Write, and Delete Messages
+
 int countMessages(string receiver) {
   database db("gee-mail.db");
   int count = 0;
@@ -36,6 +168,22 @@ int countMessages(string receiver) {
   }
 
   return count;
+}
+
+bool checkPassphrase(string messageid, string passphrase) {
+  database db("gee-mail.db");
+  string pass = secure_hash(passphrase, "┌∩┐(◣_◢)┌∩┐", 1000);
+  
+  query qry(db, "SELECT readtime FROM messages WHERE messageid = :msgid AND passphrase = :pass");
+  qry.bind(":msgid", messageid, nocopy);
+  qry.bind(":pass", pass, nocopy);
+
+  // if there is no response, then password failed
+  // increment number of attempts for that user if that user exists in database
+  if (qry.begin() == qry.end()) {
+    return false;
+  } 
+  return true;
 }
 
 vector <string> getSenders(string receiver) {
@@ -71,14 +219,6 @@ vector <string> getMessages(string sender, string receiver) {
   }
 
   return senders;
-}
-
-string getTime() {
-  time_t currentTime = time(0);
-  string datetime = asctime(localtime(&currentTime));
-  datetime.erase(remove(datetime.begin(), datetime.end(), '\n'), datetime.end());
-
-  return datetime;
 }
 
 string getMessage(string messageid){
@@ -141,139 +281,12 @@ void writeMessage(string username, string receiver, string title, string message
   cmd.execute();
 }
 
-bool check_password(string pass){
-  vector <string> passwords;
-  ifstream passfile;
-  string pw;
-
-  passfile.open("cryptogm/top_1000000.txt");
-  while (getline (passfile, pw)) {
-    passwords.push_back(pw);
-  }
-    
-  if (find(passwords.begin(), passwords.end(), pass) != passwords.end()) {
-    cout << "common password, please use a unique password" << endl;
-    return false;
-  }
-  if (pass.length() < 6) {
-    cout << "password too short" << endl;
-    return false;
-  }
-  return true;
-}
-
-bool checkPassphrase(string messageid, string passphrase) {
+void deleteMessage(string messageid) {
   database db("gee-mail.db");
-  string pass = secure_hash(passphrase, "┌∩┐(◣_◢)┌∩┐", 1000);
-  
-  query qry(db, "SELECT readtime FROM messages WHERE messageid = :msgid AND passphrase = :pass");
-  qry.bind(":msgid", messageid, nocopy);
-  qry.bind(":pass", pass, nocopy);
 
-  // if there is no response, then password failed
-  // increment number of attempts for that user if that user exists in database
-  if (qry.begin() == qry.end()) {
-    return false;
-  } 
-  return true;
-}
-
-int getChoice(){
-  int x = 0;
-
-  while(!(cin >> x)){
-    cin.clear();
-    cin.ignore(numeric_limits<streamsize>::max(),'\n');
-    cout << "Invalid input.  Try again\n: ";    
-  }
-
-  return x; 
-}
-
-bool userLogin(string username, string password) {
-  int attempts;
-  string tmp = "";
-  database db("gee-mail.db");
-  string pass = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
-  
-  query qry(db, "SELECT username, password FROM users WHERE username = :user and password = :pass");
-  qry.bind(":user", username, nocopy);
-  qry.bind(":pass", pass, nocopy);
-
-  // if there is no response, then password failed
-  // increment number of attempts for that user if that user exists in database
-  if (qry.begin() == qry.end()) {
-    cout << "bad credentials" << endl;
-    query qry(db, "SELECT attempts FROM users WHERE username = :user");
-    qry.bind(":user", username, nocopy);
-          
-    for (auto v : qry) {
-      tmp = "";
-      v.getter() >> tmp;
-      attempts = stoi(tmp);
-      attempts++;
-      command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
-      cmd.bind(":attempt", to_string(attempts), nocopy);
-      cmd.bind(":user", username, nocopy);
-      cmd.execute();
-    }          
-  }
-  // username and password match, check to make sure account is not locked
-  else {
-    query qry(db, "SELECT attempts FROM users WHERE username = :user and password = :pass");
-    qry.bind(":user", username, nocopy);
-    qry.bind(":pass", pass, nocopy);
-
-    for (auto v : qry) {
-      tmp = "";
-      v.getter() >> tmp;
-      attempts = stoi(tmp);
-      if (attempts < 3) {
-        command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
-        cmd.bind(":attempt", "0", nocopy);
-        cmd.bind(":user", username, nocopy);
-        cmd.execute();
-        cout << "success..." << endl;
-        this_thread::sleep_for (std::chrono::seconds(1));
-        return true;
-      } else {
-        cout << "UserName: " << username << " is locked" << endl;
-        cout << "Please contact the system administrator to unlock the account" << endl;
-      }
-    }
-  }
-  this_thread::sleep_for (std::chrono::seconds(3));
-  return false;
-}
-
-int userRegister(string username, string password) {
-  // return 0: success
-  // return 1: username exists
-  // return 2: password too weak
-  bool check;
-  database db("gee-mail.db");
-  
-  query qry(db, "SELECT username FROM users WHERE username = :user");
-  qry.bind(":user", username, nocopy);
-  if (qry.begin() != qry.end()) {
-    cout << "## username is taken ##" << endl;
-    return 1;
-  }
-      
-
-  check = check_password(password);
-  if (check == false) 
-    return 2;
-
-  password = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
-  command cmd(db, "INSERT INTO users (username, password, attempts) VALUES (:username, :password, :attempts)");
-  cmd.bind(":username", username, nocopy);
-  cmd.bind(":password", password, nocopy);
-  cmd.bind(":attempts", "0", nocopy);
+  command cmd(db, "DELETE FROM messages WHERE messageid = :id");
+  cmd.bind(":id", messageid, nocopy);
   cmd.execute();
-      
-  cout << "user created!"<< endl;
-  this_thread::sleep_for (std::chrono::seconds(1));
-  return 0;
-}
 
+  cout << "\nThis message has been successfully deleted..." << endl;
+}

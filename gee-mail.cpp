@@ -1,12 +1,10 @@
 #include <boost/algorithm/string.hpp>
-// #include <sqlite3.h>
 #include <algorithm>
 #include <iostream>
 #include <stdio.h>
 #include <cstdlib>
 #include <string>
 #include <vector>
-#include <ctime>
 #include <thread>
 #include <chrono>
 #include "GraphicEngine/GraphicEngine.h"
@@ -240,7 +238,87 @@ int main (int argc, char* argv[]) {
             choice = "";
           }
         }      
-      } else if (!choice.compare("3")){
+      } else if (!choice.compare("3")) { // User choses to delete a message
+        senders = getSenders(username);
+        gfx.clearScreen();
+
+        check = false;
+        while (check == false) {
+          cout << "+-------------------------------------------------------------------------------+" << endl;
+          cout << "| GeeMail Messaging Platform: Deleting a message                                |" << endl;
+          cout << "+-------------------------------------------------------------------------------+" << endl;
+          for (i = 0; i < senders.size(); i++) {
+            cout << " [" << i+1 << "] " << senders[i] << endl;
+          }      
+          cout << "+-------------------------------------------------------------------------------+" << endl;
+          cout << "Which user would you like to delete a message from?" << endl;
+          cout << "\n: ";
+          // getline(cin, senderChoice);
+          senderChoice = getChoice();
+
+          if ((senderChoice <= senders.size()) && (senderChoice > 0)) {
+            sender = senders[senderChoice-1];
+            receiver = username;
+            cout << "+-------------------------------------------------------------------------------+" << endl;
+            cout << " Messages from: " << sender << endl;
+            cout << "+-------------------------------------------------------------------------------+" << endl;
+            messages = getMessages(sender, receiver);
+            for (i = 0; i < messages.size(); i++) {
+              split(temp, messages[i], is_any_of("\t"));
+              if (temp[1].compare("0")) {
+                tmp = "read " + temp[1];
+              } else {
+                tmp = "not read";
+              }
+              cout << " [" << i+1 << "] " << temp[0] << " | " << tmp << " | " << temp[3] << endl;
+            }
+            select = false;
+            while (select == false) {
+              cout << "+-------------------------------------------------------------------------------+" << endl;
+              cout << "\nWhich message would you like to delete?" << endl;
+              cout << ": ";
+              msgChoice = getChoice();
+
+              if ((msgChoice <= messages.size()) && (msgChoice > 0)) 
+                select = true;
+            }
+
+            message = messages[msgChoice-1];
+            split(msgData, message, is_any_of("\t"));
+            timestamp = msgData[0];
+            messageid = msgData[2];
+            title = msgData[3];
+            cout << "\nEnter the passphrase for this message" << endl;
+            cin.ignore();
+            cin.clear();
+            cin.sync();
+            passphrase = getpass(": ");
+          
+            checkPP = checkPassphrase(messageid, passphrase);
+            if(checkPP) {
+              plaintext = getMessage(messageid);
+              cout << "   From: " << sender << endl;
+              cout << "     To: " << receiver << endl;
+              cout << "  Title: " << title << endl;
+              cout << "Message: " << plaintext << endl;
+              deleteMessage(messageid);
+
+              cout << "Press Enter to return to main menu...\n";
+              cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+              choice = "";
+              check = true;
+            } else {
+              cout << "bad passphrase..." << endl;
+              cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+              choice = "";
+              check = true;            
+            }          
+          } else {
+            gfx.clearScreen();
+          }
+        }
+
+      } else if (!choice.compare("4")){  // User chooses to log out
         logged_in = false;
         choice = "";
       }else {
@@ -261,7 +339,8 @@ int main (int argc, char* argv[]) {
         cout << "\nWould you like to read or write a message?" << endl;
         cout << "[1] Read Message" << endl;
         cout << "[2] Write Message" << endl;
-        cout << "[3] Logout" << endl;
+        cout << "[3] Delete Message" << endl;
+        cout << "[4] Logout" << endl;
         cout << ": ";
         getline(cin, choice);
       }
