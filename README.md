@@ -77,12 +77,13 @@ vector <string> getSenders(string receiver)
 ```c++
 vector <string> getMessages(string sender, string receiver)
 ```
->returns string array of all messages from a given sender
-
+>returns string array of all messages from a given sender<br />
+>each string in the array is tab-delimeted <br />
+> string format: writetime + "\t" + readtime +"\t" + messageid + "\t" + title
 ```c++
 string getMessage(string messageid);
 ```
->returns a tab-delimited ("\t") string of a message given its id
+>returns plaintext string of a message given its id 
 
 ```c++
 writeMessage(string username, string receiver, string title, string message, string writetime, string readtime, string passphrase);
