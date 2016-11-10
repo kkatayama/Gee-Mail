@@ -79,7 +79,8 @@ vector <string> getMessages(string sender, string receiver)
 ```
 >returns string array of all messages from a given sender<br />
 >each string in the array is tab-delimeted <br />
-> string format: writetime + "\t" + readtime +"\t" + messageid + "\t" + title
+> string format: writetime + "\t" + readtime +"\t" + messageid + "\t" + title<br />
+
 ```c++
 string getMessage(string messageid);
 ```
