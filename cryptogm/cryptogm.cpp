@@ -42,14 +42,14 @@ string* encrypt(string plaintext, string passphrase) {
   // Pretty print key
   encoded.clear();
   StringSource(key, sizeof(key), true, new HexEncoder(new StringSink(encoded)));
-  cout << "key: " << encoded << endl;
+  // cout << "key: " << encoded << endl;
   string key_str = encoded;
   // cout << "key raw: " << sizeof(key) << endl;
 
   // Pretty print iv
   encoded.clear();
   StringSource(iv, sizeof(iv), true, new HexEncoder(new StringSink(encoded)));
-  cout << "iv: " << encoded << endl;
+  // cout << "iv: " << encoded << endl;
   string iv_str = encoded;
 
   /*********************************/
@@ -71,7 +71,7 @@ string* encrypt(string plaintext, string passphrase) {
   // cout << "cipher text: " << encoded << endl;
   string ciphertext = encoded;
 
-  cout << "ct: " << ciphertext << endl;
+  // cout << "ct: " << ciphertext << endl;
   cdata[0] = iv_str;
   cdata[1] = key_str;
   cdata[2] = ciphertext;
@@ -124,6 +124,5 @@ string decrypt(string ciphertext, string key_str, string iv_str) {
     exit(1);
   }
 
-  return decrypted_text;
-  
+  return decrypted_text;  
 }

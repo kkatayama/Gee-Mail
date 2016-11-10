@@ -137,6 +137,7 @@ int main (int argc, char* argv[]) {
             messageid = msgData[1];
             title = msgData[2];
             cout << "Enter the passphrase for this message" << endl;
+            cout << ": ";
             //passphrase = getpass("passphrase: ");
             cin.ignore();
             cin.clear();
@@ -146,7 +147,10 @@ int main (int argc, char* argv[]) {
             checkPP = checkPassphrase(messageid, passphrase);
             if(checkPP) {
               plaintext = getMessage(messageid);
-              cout << plaintext << endl;
+              cout << "   From: " << sender << endl;
+              cout << "     To: " << receiver << endl;
+              cout << "  Title: " << title << endl;
+              cout << "Message: " << plaintext << endl;
               
             } else {
               cout << "bad passphrase..." << endl;

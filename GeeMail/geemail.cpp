@@ -11,12 +11,16 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
+#include "aes.h"
+#include "hex.h"
+#include "filters.h"
 #include "../cryptogm/sha256.h"
 #include "../cryptogm/cryptogm.h"
 #include "../sqlite3pp/sqlite3pp.h"
 
 using namespace std;
 using namespace boost;
+using namespace CryptoPP;
 using namespace sqlite3pp;
 
 int countMessages(string receiver) {
@@ -84,13 +88,15 @@ string getMessage(string messageid){
 
     v.getter() >> cipher >> key;
   }
-  key = secure_hash(key, "┌∩┐(◣_◢)┌∩┐", 1000);
+  byte kt[ AES::MAX_KEYLENGTH ];
+  memcpy(kt, key.c_str(), AES::MAX_KEYLENGTH);
+
+  key.clear();
+  StringSource(kt, sizeof(kt), true, new HexEncoder(new StringSink(key)));
+
   iv = cipher.substr(0,32);
   ciphertext = cipher.substr(32);
   message = decrypt(ciphertext, key, iv);
-  cout << "iv: " << iv << endl; 
-  cout << "kt: " << key << endl; 
-  cout << "ct: " << ciphertext << endl; 
   return message;
 }
 
@@ -113,11 +119,7 @@ void writeMessage(string username, string receiver, string title, string message
   cipherdata = encrypt(message, passphrase);
   ciphertext = cipherdata[2];
   key = cipherdata[1];
-  iv = cipherdata[0];
-  cout << "iv: " << iv << endl; 
-  cout << "kt: " << key << endl; 
-  cout << "ct: " << ciphertext << endl; 
-  
+  iv = cipherdata[0];  
   
   command cmd(db, "INSERT INTO messages (sender, receiver, title, message, writetime, readtime, passphrase) VALUES (:send, :rcv, :ttl, :msg, :write, :read, :pass)");
   cmd.bind(":send", username, nocopy);
