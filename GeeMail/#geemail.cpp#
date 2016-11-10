@@ -84,7 +84,7 @@ string getMessage(string messageid){
 
     v.getter() >> cipher >> key;
   }
-  key = secure_hash(key, "┌∩┐(◣_◢)┌∩┐", 1000);
+  //  key = secure_hash(key, "┌∩┐(◣_◢)┌∩┐", 1000);
   iv = cipher.substr(0,32);
   ciphertext = cipher.substr(32);
   message = decrypt(ciphertext, key, iv);
