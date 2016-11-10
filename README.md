@@ -35,6 +35,7 @@ int getChoice()
 ```
 >returns int only if user inputs an integer
 
+<br />
 ##Login and Registraion
 ```c++
 bool check_password(string pass)
@@ -45,9 +46,9 @@ bool check_password(string pass)
 ```c++
 int userRegister(string username, string password)
 ```
->returns 0: successfully registered
->returns 1: username is taken
->returns 2: password is too weak
+>returns 0: successfully registered<br />
+>returns 1: username is taken<br />
+>returns 2: password is too weak<br />
 
 ```c++
 bool userLogin(string username, string pass)
@@ -55,6 +56,7 @@ bool userLogin(string username, string pass)
 >returns true if login successful
 >returns false if login failed
 
+<br />
 ##Read, Write, and Delete Messages
 ```c++
 int countMessages(string receiver)
@@ -92,7 +94,8 @@ deleteMessage(string messageid)
 ```
 >deletes a message given its id
 
-####Backend Functions
+<br />
+##Backend Functions
 ```c++
 string secure_hash(string secret, string salt, int stretch);
 ```
