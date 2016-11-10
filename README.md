@@ -41,7 +41,7 @@ int getChoice()
 ```c++
 bool check_password(string pass)
 ```
->returns true if password is strong
+>returns true if password is strong<br />
 >returns false if password is weak
 
 <br />
@@ -56,7 +56,7 @@ int userRegister(string username, string password)
 ```c++
 bool userLogin(string username, string pass)
 ```
->returns true if login successful
+>returns true if login successful<br />
 >returns false if login failed
 
 <br />
@@ -70,7 +70,7 @@ int countMessages(string receiver)
 ```c++
 bool checkPassphrase(string messageid, string passphrase)
 ```
->returns true if passphrase matches
+>returns true if passphrase matches<br />
 >returns false if bad passphrase
 
 <br />
