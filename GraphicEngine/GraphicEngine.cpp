@@ -29,7 +29,6 @@ void GraphicEngine::clearScreen()
 void GraphicEngine::printIntro()
 {
    GraphicEngine::clearScreen();
-            +-------------------------------------------------------------------------------+
    cout << "*********************************************************************************" << endl;
    cout << "* CPEG-676 Secure Systems: Project 4: Gee-Mail                                  *" << endl;
    cout << "*********************************** Authors *************************************" << endl;
