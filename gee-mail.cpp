@@ -2,8 +2,6 @@
 // #include <sqlite3.h>
 #include <algorithm>
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <stdio.h>
 #include <cstdlib>
 #include <string>
@@ -13,13 +11,9 @@
 #include <chrono>
 #include "GraphicEngine/GraphicEngine.h"
 #include "GeeMail/geemail.h"
-#include "cryptogm/sha256.h"
-#include "cryptogm/cryptogm.h"
-#include "sqlite3pp/sqlite3pp.h"
 
 using namespace std;
 using namespace boost;
-using namespace sqlite3pp;
 
 int main (int argc, char* argv[]) {
   bool running = true;
