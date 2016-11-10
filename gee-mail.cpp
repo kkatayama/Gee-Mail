@@ -251,8 +251,8 @@ int main (int argc, char* argv[]) {
         cout << "| GeeMail Messaging Platform: Main Menu                                         |" << endl;
         cout << "+-------------------------------------------------------------------------------+" << endl;
     
-        cout << "Welcome " << username << endl;
-        cout << "You have " << messageCount << " messages from the following users" << endl;
+        cout << "Welcome " << username << ", ";
+        cout << "you have " << messageCount << " messages from the following users" << endl;
         cout << "-----------------------" << endl;
         for (int i = 0; i < senders.size(); i++) {
           cout << "  " << senders[i] << endl;
