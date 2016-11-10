@@ -30,6 +30,7 @@ string getTime()
 ```
 >returns datetime as a string with newline character removed
 
+<br />
 ```c++
 int getChoice()
 ```
@@ -43,6 +44,7 @@ bool check_password(string pass)
 >returns true if password is strong
 >returns false if password is weak
 
+<br />
 ```c++
 int userRegister(string username, string password)
 ```
@@ -50,6 +52,7 @@ int userRegister(string username, string password)
 >returns 1: username is taken<br />
 >returns 2: password is too weak<br />
 
+<br />
 ```c++
 bool userLogin(string username, string pass)
 ```
@@ -63,32 +66,38 @@ int countMessages(string receiver)
 ```
 >returns number of messages for a given user
 
+<br />
 ```c++
 bool checkPassphrase(string messageid, string passphrase)
 ```
 >returns true if passphrase matches
 >returns false if bad passphrase
 
+<br />
 ```c++
 vector <string> getSenders(string receiver)
 ```
 >returns string array of unique senders
 
+<br />
 ```c++
 vector <string> getMessages(string sender, string receiver)
 ```
 >returns string array of all messages from a given sender
 
+<br />
 ```c++
 string getMessage(string messageid);
 ```
 >returns string of a message given its id
 
+<br />
 ```c++
 writeMessage(string username, string receiver, string title, string message, string writetime, string readtime, string passphrase);
 ```
 >saves a message into the database
 
+<br />
 ```c++
 deleteMessage(string messageid)
 ```
