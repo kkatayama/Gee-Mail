@@ -57,23 +57,33 @@ vector <string> getMessages(string sender, string receiver) {
   database db("gee-mail.db");
   vector <string> senders;
 
-  query qry(db, "SELECT messageid, title, writetime FROM messages WHERE sender = :send AND receiver = :user");
+  query qry(db, "SELECT messageid, title, writetime, readtime FROM messages WHERE sender = :send AND receiver = :user");
   qry.bind(":send", sender, nocopy);
   qry.bind(":user", receiver, nocopy);
   for (auto v : qry) {
     string messageid = "";
     string title = "";
     string writetime = "";
+    string readtime = "";
     
-    v.getter() >> messageid >> title >> writetime;
-    senders.push_back(writetime +"\t" + messageid + "\t" + title);
+    v.getter() >> messageid >> title >> writetime >> readtime;
+    senders.push_back(writetime + "\t" + readtime +"\t" + messageid + "\t" + title);
   }
 
   return senders;
 }
 
+string getTime() {
+  time_t currentTime = time(0);
+  string datetime = asctime(localtime(&currentTime));
+  datetime.erase(remove(datetime.begin(), datetime.end(), '\n'), datetime.end());
+
+  return datetime;
+}
+
 string getMessage(string messageid){
   database db("gee-mail.db");
+  string readtime;
   string message;
   string ciphertext;
   string cipher;
@@ -85,9 +95,16 @@ string getMessage(string messageid){
   for (auto v : qry) {
     cipher = "";
     key = "";
-
     v.getter() >> cipher >> key;
   }
+
+  readtime = getTime();
+  
+  command cmd(db, "UPDATE messages SET readtime = :read WHERE messageid = :msgid");
+  cmd.bind(":read", readtime, nocopy);
+  cmd.bind(":msgid", messageid, nocopy);
+  cmd.execute();    
+  
   byte kt[ AES::MAX_KEYLENGTH ];
   memcpy(kt, key.c_str(), AES::MAX_KEYLENGTH);
 
@@ -98,14 +115,6 @@ string getMessage(string messageid){
   ciphertext = cipher.substr(32);
   message = decrypt(ciphertext, key, iv);
   return message;
-}
-
-string getTime() {
-  time_t currentTime = time(0);
-  string datetime = asctime(localtime(&currentTime));
-  datetime.erase(remove(datetime.begin(), datetime.end(), '\n'), datetime.end());
-
-  return datetime;
 }
 
 void writeMessage(string username, string receiver, string title, string message, string writetime, string readtime, string passphrase) {
@@ -164,7 +173,6 @@ bool checkPassphrase(string messageid, string passphrase) {
   // if there is no response, then password failed
   // increment number of attempts for that user if that user exists in database
   if (qry.begin() == qry.end()) {
-    cout << pass << endl;
     return false;
   } 
   return true;
