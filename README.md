@@ -56,6 +56,7 @@ bool userLogin(string username, string pass)
 >returns true if login successful<br />
 >returns false if login failed
 
+<br />
 ##Read, Write, and Delete Messages
 ```c++
 int countMessages(string receiver)
