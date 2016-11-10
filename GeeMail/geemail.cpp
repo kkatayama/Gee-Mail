@@ -49,21 +49,49 @@ vector <string> getSenders(string receiver) {
   return senders;
 }
 
-vector <string> getMessages(string receiver) {
+vector <string> getMessages(string sender, string receiver) {
   database db("gee-mail.db");
   vector <string> senders;
 
-  query qry(db, "SELECT title, writetime FROM messages WHERE receiver = :user");
+  query qry(db, "SELECT messageid, title, writetime FROM messages WHERE sender = :send AND receiver = :user");
+  qry.bind(":send", sender, nocopy);
   qry.bind(":user", receiver, nocopy);
   for (auto v : qry) {
-    string sender = "";
-    v.getter() >> sender;
-    senders.push_back(sender);
+    string messageid = "";
+    string title = "";
+    string writetime = "";
+    
+    v.getter() >> messageid >> title >> writetime;
+    senders.push_back(writetime +"\t" + messageid + "\t" + title);
   }
 
   return senders;
 }
 
+string getMessage(string messageid){
+  database db("gee-mail.db");
+  string message;
+  string ciphertext;
+  string cipher;
+  string key;
+  string iv;
+
+  query qry(db, "SELECT message, passphrase FROM messages WHERE messageid = :msgid");
+  qry.bind(":msgid", messageid, nocopy);
+  for (auto v : qry) {
+    cipher = "";
+    key = "";
+
+    v.getter() >> cipher >> key;
+  }
+  iv = cipher.substr(0,32);
+  ciphertext = cipher.substr(32);
+  message = decrypt(ciphertext, key, iv);
+  cout << "iv: " << iv << endl; 
+  cout << "kt: " << key << endl; 
+  cout << "ct: " << ciphertext << endl; 
+  return message;
+}
 
 string getTime() {
   time_t currentTime = time(0);
@@ -118,22 +146,40 @@ bool check_password(string pass){
   return true;
 }
 
+bool checkPassphrase(string messageid, string passphrase) {
+  database db("gee-mail.db");
+  string pass = secure_hash(passphrase, "┌∩┐(◣_◢)┌∩┐", 1000);
+  
+  query qry(db, "SELECT readtime FROM messages WHERE messageid = :msgid AND passphrase = :pass");
+  qry.bind(":msgid", messageid, nocopy);
+  qry.bind(":pass", pass, nocopy);
+
+  // if there is no response, then password failed
+  // increment number of attempts for that user if that user exists in database
+  if (qry.begin() == qry.end()) {
+    cout << pass << endl;
+    return false;
+  } 
+  return true;
+}
+
 int getChoice(){
   int x = 0;
 
   while(!(cin >> x)){
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(),'\n');
-    cout << "Invalid input.  Try again: ";    
+    cout << "Invalid input.  Try again\n: ";    
   }
 
   return x; 
 }
 
-bool userLogin(string username, string pass) {
+bool userLogin(string username, string password) {
   int attempts;
   string tmp = "";
   database db("gee-mail.db");
+  string pass = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
   
   query qry(db, "SELECT username, password FROM users WHERE username = :user and password = :pass");
   qry.bind(":user", username, nocopy);

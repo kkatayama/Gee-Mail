@@ -43,9 +43,8 @@ int main (int argc, char* argv[]) {
       cout << "username: ";
       getline(cin, username);
       password = getpass("password: ");
-      pass = secure_hash(password, "┌∩┐(◣_◢)┌∩┐", 10000);
 
-      logged_in = userLogin(username, pass);
+      logged_in = userLogin(username, password);
       choice = "";
       
     } else if (!choice.compare("2")) { // User chooses to REGISTER
@@ -79,17 +78,23 @@ int main (int argc, char* argv[]) {
   /* Read and Write Messages */
   /***************************/
   choice = "";
+  string sender     = "";
   string receiver   = "";
   string title      = "";
   string message    = "";
   string passphrase = "";
   string timestamp  = "";
+  string messageid  = "";
+  string plaintext = "";
   int senderChoice;
+  int msgChoice;
   int i;
   int writeCount;
   int messageCount = 0;
+  bool checkPP = false;
   vector <string> senders;
   vector <string> messages;
+  vector <string> msgData;
   
   while(logged_in) {
     if(!choice.compare("1")) { // User chooses to READ MESSAGE
@@ -101,8 +106,8 @@ int main (int argc, char* argv[]) {
         cout << "+-----------------------------------------------+" << endl;
         cout << "| GeeMail Messaging Platform: Reading a message |" << endl;
         cout << "+-----------------------------------------------+" << endl;
-        for (int i = 0; i < senders.size(); i++) {
-          cout << " [" << i << "]" << senders[i] << endl;
+        for (i = 0; i < senders.size(); i++) {
+          cout << " [" << i+1 << "] " << senders[i] << endl;
         }      
         cout << "+-----------------------------------------------+" << endl;
         cout << "Which user would you like to read a message from?" << endl;
@@ -110,12 +115,45 @@ int main (int argc, char* argv[]) {
         // getline(cin, senderChoice);
         senderChoice = getChoice();
 
-        if ((senderChoice > senders.size()) || (senderChoice < 1)) {
+        if ((senderChoice <= senders.size()) && (senderChoice > 0)) {
+          sender = senders[senderChoice-1];
+          receiver = username;
           cout << "+-----------------------------------------------+" << endl;
-          cout << " Messages from: " << senders[i] << endl;
+          cout << " Messages from: " << sender << endl;
           cout << "+-----------------------------------------------+" << endl;
-          messages = getMessages(username);
-          
+          messages = getMessages(sender, receiver);
+          for (i = 0; i < messages.size(); i++) {
+            cout << " [" << i+1 << "] " << messages[i] << endl;
+          }
+          cout << "+-----------------------------------------------+" << endl;
+          cout << "Which message would you like to read?" << endl;
+          cout << ": ";
+          msgChoice = getChoice();
+
+          if ((msgChoice <= messages.size()) && (msgChoice > 0)) {
+            message = messages[msgChoice-1];
+            boost::split(msgData, message, boost::is_any_of("\t"));
+            timestamp = msgData[0];
+            messageid = msgData[1];
+            title = msgData[2];
+            cout << "Enter the passphrase for this message" << endl;
+            //passphrase = getpass("passphrase: ");
+            cin.ignore();
+            cin.clear();
+            cin.sync();
+            getline(cin, passphrase);
+
+            checkPP = checkPassphrase(messageid, passphrase);
+            if(checkPP) {
+              plaintext = getMessage(messageid);
+              cout << plaintext << endl;
+              
+            } else {
+              cout << "bad passphrase..." << endl;
+            }
+          }
+        } else {
+          gfx.clearScreen();
         }
       }
       
