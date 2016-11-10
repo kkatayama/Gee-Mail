@@ -53,7 +53,7 @@ vector <string> getMessages(string receiver) {
   database db("gee-mail.db");
   vector <string> senders;
 
-  query qry(db, "SELECT DISTINCT sender FROM messages WHERE receiver = :user");
+  query qry(db, "SELECT title, writetime FROM messages WHERE receiver = :user");
   qry.bind(":user", receiver, nocopy);
   for (auto v : qry) {
     string sender = "";
@@ -97,19 +97,12 @@ void writeMessage(string username, string receiver, string title, string message
   cmd.execute();
 }
 
-bool checkSender(string send) {
-  database db("gee-mail.db");
-  
-  
-  return false;
-}
-
 bool check_password(string pass){
   vector <string> passwords;
   ifstream passfile;
   string pw;
 
-  passfile.open("../cryptogm/top_1000000.txt");
+  passfile.open("cryptogm/top_1000000.txt");
   while (getline (passfile, pw)) {
     passwords.push_back(pw);
   }
@@ -175,6 +168,10 @@ bool userLogin(string username, string pass) {
       v.getter() >> tmp;
       attempts = stoi(tmp);
       if (attempts < 3) {
+        command cmd(db, "UPDATE users SET attempts = :attempt WHERE username = :user");
+        cmd.bind(":attempt", "0", nocopy);
+        cmd.bind(":user", username, nocopy);
+        cmd.execute();
         cout << "success..." << endl;
         this_thread::sleep_for (std::chrono::seconds(1));
         return true;
