@@ -48,8 +48,6 @@ int main (int argc, char* argv[]) {
   vector <string> msgData;
   vector <string> temp;
 
-  logged_in = false;
-
   while(running) {
     /********************************/
     /* Login or Register a New User */

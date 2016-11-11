@@ -15,6 +15,7 @@ int countMessages(std::string receiver);
 bool checkPassphrase(std::string messageid, std::string passphrase);
 std::vector <std::string> getSenders(std::string receiver);
 std::vector <std::string> getMessages(std::string sender, std::string receiver);
+std::vector <std::string> getAllMessages(std::string receiver);
 std::string getMessage(std::string messageid);
 void writeMessage(std::string username, std::string receiver, std::string title, std::string message, std::string writetime, std::string readtime, std::string passphrase);
 void deleteMessage(std::string messageid);

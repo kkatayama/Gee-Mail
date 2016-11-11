@@ -221,6 +221,27 @@ vector <string> getMessages(string sender, string receiver) {
   return senders;
 }
 
+// For WEB Interface
+vector <string> getAllMessages(string receiver) {
+  database db("gee-mail.db");
+  vector <string> messages;
+
+  query qry(db, "SELECT sender, messageid, title, writetime, readtime FROM messages WHERE receiver = :user");
+  qry.bind(":user", receiver, nocopy);
+  for (auto v : qry) {
+    string sender = "";
+    string messageid = "";
+    string title = "";
+    string writetime = "";
+    string readtime = "";
+    
+    v.getter() >> sender >> messageid >> title >> writetime >> readtime;
+    messages.push_back(messageid +"\t" + sender + "\t" + writetime + "\t" + readtime +"\t" + title);
+  }
+
+  return messages;
+}
+
 string getMessage(string messageid){
   database db("gee-mail.db");
   string readtime;
