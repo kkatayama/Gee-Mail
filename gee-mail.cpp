@@ -341,6 +341,12 @@ int main (int argc, char* argv[]) {
         cout << "[4] Logout" << endl;
         cout << ": ";
         getline(cin, choice);
+
+        if (!senders.size() && !choice.compare("1")) {
+          choice = "";
+          cout << "\nYou don't have any messages to read..." << endl;
+          cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+        }
       }
     }
   }

@@ -290,12 +290,14 @@ void writeMessage(string username, string receiver, string title, string message
   ciphertext = cipherdata[2];
   key = cipherdata[1];
   iv = cipherdata[0];  
+
+  string wtf = iv+ciphertext;
   
   command cmd(db, "INSERT INTO messages (sender, receiver, title, message, writetime, readtime, passphrase) VALUES (:send, :rcv, :ttl, :msg, :write, :read, :pass)");
   cmd.bind(":send", username, nocopy);
   cmd.bind(":rcv", receiver, nocopy);
   cmd.bind(":ttl", title, nocopy);
-  cmd.bind(":msg", iv+ciphertext, nocopy);
+  cmd.bind(":msg", wtf, nocopy);
   cmd.bind(":write", writetime, nocopy);
   cmd.bind(":read", readtime, nocopy);
   cmd.bind(":pass", passphrase, nocopy);
