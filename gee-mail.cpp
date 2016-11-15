@@ -24,7 +24,7 @@ int main (int argc, char* argv[]) {
   string password = "";
   string choice = "";
   string pass = "";
-  bool logged_in;
+  bool logged_in=false;
   bool check;
   int checkRegister;
 
