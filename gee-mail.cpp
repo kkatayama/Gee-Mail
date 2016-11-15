@@ -273,7 +273,7 @@ int main (int argc, char* argv[]) {
           while (select == false) {
             cout << "+-------------------------------------------------------------------------------------------------------+" << endl;
             cout << "\nWhich message would you like to delete?" << endl;
-            cout << ": ";
+            cout << "ID: ";
             msgChoice = getChoice();
             
             if ((msgChoice <= messages.size()) && (msgChoice > 0)) 
