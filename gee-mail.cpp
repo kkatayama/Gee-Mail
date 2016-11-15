@@ -1,6 +1,8 @@
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <stdio.h>
 #include <cstdlib>
 #include <string>
@@ -35,8 +37,8 @@ int main (int argc, char* argv[]) {
   string timestamp  = "";
   string messageid  = "";
   string plaintext = "";
+  string status = "";
   string tmp = "";
-  int senderChoice;
   int msgChoice;
   int i;
   int writeCount;
@@ -116,73 +118,74 @@ int main (int argc, char* argv[]) {
           cout << "+-------------------------------------------------------------------------------+" << endl;
           cout << "| GeeMail Messaging Platform: Reading a message                                 |" << endl;
           cout << "+-------------------------------------------------------------------------------+" << endl;
-          for (i = 0; i < senders.size(); i++) {
-            cout << " [" << i+1 << "] " << senders[i] << endl;
-          }      
-          cout << "+-------------------------------------------------------------------------------+" << endl;
-          cout << "Which user would you like to read a message from?" << endl;
-          cout << "\n: ";
-          // getline(cin, senderChoice);
-          senderChoice = getChoice();
 
-          if ((senderChoice <= senders.size()) && (senderChoice > 0)) {
-            sender = senders[senderChoice-1];
-            receiver = username;
-            cout << "+-------------------------------------------------------------------------------+" << endl;
-            cout << " Messages from: " << sender << endl;
-            cout << "+-------------------------------------------------------------------------------+" << endl;
-            messages = getMessages(sender, receiver);
-            for (i = 0; i < messages.size(); i++) {
-              split(temp, messages[i], is_any_of("\t"));
-              if (temp[1].compare("0")) {
-                tmp = "read " + temp[1];
-              } else {
-                tmp = "not read";
-              }
-              cout << " [" << i+1 << "] " << temp[0] << " | " << tmp << " | " << temp[3] << endl;
-            }
-            select = false;
-            while (select == false) {
-              cout << "+-------------------------------------------------------------------------------+" << endl;
-              cout << "\nWhich message would you like to read?" << endl;
-              cout << ": ";
-              msgChoice = getChoice();
-
-              if ((msgChoice <= messages.size()) && (msgChoice > 0)) 
-                select = true;
-            }
-
-            message = messages[msgChoice-1];
-            split(msgData, message, is_any_of("\t"));
-            timestamp = msgData[0];
-            messageid = msgData[2];
-            title = msgData[3];
-            cout << "\nEnter the passphrase for this message" << endl;
-            cin.ignore();
-            cin.clear();
-            cin.sync();
-            passphrase = getpass(": ");
+          messageCount = countMessages(username);
+          senders = getSenders(username);
+          receiver = username;
+          cout << "+--------------------------------------------------------------------------------------------------------------+" << endl;
+          cout << "| [ID] |    SENDER    |  MESSAGE SENT DATE TIME  |  MESSAGE READ DATE TIME  |  STATUS  |     SUBJECT TITLE     |" << endl;
+          cout << "+--------------------------------------------------------------------------------------------------------------+" << endl;
           
-            checkPP = checkPassphrase(messageid, passphrase);
-            if(checkPP) {
-              plaintext = getMessage(messageid);
-              cout << "   From: " << sender << endl;
-              cout << "     To: " << receiver << endl;
-              cout << "  Title: " << title << endl;
-              cout << "Message: " << plaintext << endl;
-              cout << "\nPress Enter to return to main menu...\n";
-              cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-              choice = "";
-              check = true;
+          // messages = getMessages(sender, receiver);
+          messages = getAllMessages(receiver);
+        
+          for (i = 0; i < messages.size(); i++) {
+            split(temp, messages[i], is_any_of("\t"));
+            if (temp[3].compare("0")) {
+              // tmp = "read " + temp[3];
+              tmp = temp[3];
+              status = "read";
             } else {
-              cout << "bad passphrase..." << endl;
-              cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-              choice = "";
-              check = true;            
-            }          
-          } else {
-            gfx.clearScreen();
+              // tmp = "not read";
+              tmp = "          -";
+              status = "not read";
+            }
+            cout << "  [" << right << setw(2) << i+1 << "] | " << left <<  setw(12) << temp[1] << " | " << setw(24) << temp[2] << " | "<< setw(24) << tmp << " | " << setw(8) << status << " | " << setw(22) << temp[4] << right << "|" << endl;
           }
+          
+          select = false;
+          while (select == false) {
+            cout << "+--------------------------------------------------------------------------------------------------------------+" << endl;
+            cout << "\nWhich message would you like to read?" << endl;
+            cout << "ID: ";
+            msgChoice = getChoice();
+            
+            if ((msgChoice <= messages.size()) && (msgChoice > 0)) 
+              select = true;
+          }
+
+          message = messages[msgChoice-1];
+          split(msgData, message, is_any_of("\t"));
+          timestamp = msgData[2];
+          sender = msgData[1];
+          messageid = msgData[0];
+          title = msgData[4];
+          cout << "\nEnter the passphrase for this message" << endl;
+          cin.ignore();
+          cin.clear();
+          cin.sync();
+          passphrase = getpass(": ");
+          
+          checkPP = checkPassphrase(messageid, passphrase);
+          if(checkPP) {
+            plaintext = getMessage(messageid);
+            cout << "   From: " << sender << endl;
+            cout << "     To: " << receiver << endl;
+            cout << "  Title: " << title << endl;
+            cout << "Message: " << plaintext << endl;
+            cout << "\nPress Enter to return to main menu...\n";
+            cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+            choice = "";
+            check = true;
+          } else {
+            cout << "bad passphrase..." << endl;
+            cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+            choice = "";
+            check = true;            
+          }          
+          // } else {
+          // gfx.clearScreen();
+          // }
         }
             
       } else if (!choice.compare("2")) { // User chooses to WRITE MESSAGE
@@ -245,75 +248,73 @@ int main (int argc, char* argv[]) {
           cout << "+-------------------------------------------------------------------------------+" << endl;
           cout << "| GeeMail Messaging Platform: Deleting a message                                |" << endl;
           cout << "+-------------------------------------------------------------------------------+" << endl;
-          for (i = 0; i < senders.size(); i++) {
-            cout << " [" << i+1 << "] " << senders[i] << endl;
-          }      
-          cout << "+-------------------------------------------------------------------------------+" << endl;
-          cout << "Which user would you like to delete a message from?" << endl;
-          cout << "\n: ";
-          // getline(cin, senderChoice);
-          senderChoice = getChoice();
-
-          if ((senderChoice <= senders.size()) && (senderChoice > 0)) {
-            sender = senders[senderChoice-1];
-            receiver = username;
-            cout << "+-------------------------------------------------------------------------------+" << endl;
-            cout << " Messages from: " << sender << endl;
-            cout << "+-------------------------------------------------------------------------------+" << endl;
-            messages = getMessages(sender, receiver);
-            for (i = 0; i < messages.size(); i++) {
-              split(temp, messages[i], is_any_of("\t"));
-              if (temp[1].compare("0")) {
-                tmp = "read " + temp[1];
-              } else {
-                tmp = "not read";
-              }
-              cout << " [" << i+1 << "] " << temp[0] << " | " << tmp << " | " << temp[3] << endl;
-            }
-            select = false;
-            while (select == false) {
-              cout << "+-------------------------------------------------------------------------------+" << endl;
-              cout << "\nWhich message would you like to delete?" << endl;
-              cout << ": ";
-              msgChoice = getChoice();
-
-              if ((msgChoice <= messages.size()) && (msgChoice > 0)) 
-                select = true;
-            }
-
-            message = messages[msgChoice-1];
-            split(msgData, message, is_any_of("\t"));
-            timestamp = msgData[0];
-            messageid = msgData[2];
-            title = msgData[3];
-            cout << "\nEnter the passphrase for this message" << endl;
-            cin.ignore();
-            cin.clear();
-            cin.sync();
-            passphrase = getpass(": ");
+          cout << "+--------------------------------------------------------------------------------------------------------------+" << endl;
+          cout << "| [ID] |    SENDER    |  MESSAGE SENT DATE TIME  |  MESSAGE READ DATE TIME  |  STATUS  |     SUBJECT TITLE     |" << endl;
+          cout << "+--------------------------------------------------------------------------------------------------------------+" << endl;
           
-            checkPP = checkPassphrase(messageid, passphrase);
-            if(checkPP) {
-              plaintext = getMessage(messageid);
-              cout << "   From: " << sender << endl;
-              cout << "     To: " << receiver << endl;
-              cout << "  Title: " << title << endl;
-              cout << "Message: " << plaintext << endl;
-              deleteMessage(messageid);
-
-              cout << "Press Enter to return to main menu...\n";
-              cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-              choice = "";
-              check = true;
+          // messages = getMessages(sender, receiver);
+          messages = getAllMessages(receiver);
+        
+          for (i = 0; i < messages.size(); i++) {
+            split(temp, messages[i], is_any_of("\t"));
+            if (temp[3].compare("0")) {
+              // tmp = "read " + temp[3];
+              tmp = temp[3];
+              status = "read";
             } else {
-              cout << "bad passphrase..." << endl;
-              cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+              // tmp = "not read";
+              tmp = "          -";
+              status = "not read";
+            }
+            cout << "  [" << right << setw(2) << i+1 << "] | " << left <<  setw(12) << temp[1] << " | " << setw(24) << temp[2] << " | "<< setw(24) << tmp << " | " << setw(8) << status << " | " << setw(22) << temp[4] << right << "|" << endl;
+          }
+          
+          select = false;
+          while (select == false) {
+            cout << "+-------------------------------------------------------------------------------------------------------+" << endl;
+            cout << "\nWhich message would you like to delete?" << endl;
+            cout << ": ";
+            msgChoice = getChoice();
+            
+            if ((msgChoice <= messages.size()) && (msgChoice > 0)) 
+              select = true;
+          }
+          
+          message = messages[msgChoice-1];
+          split(msgData, message, is_any_of("\t"));
+          timestamp = msgData[2];
+          sender = msgData[1];
+          messageid = msgData[0];
+          title = msgData[4];
+
+          cout << "\nEnter the passphrase for this message" << endl;
+          cin.ignore();
+          cin.clear();
+          cin.sync();
+          passphrase = getpass(": ");
+          
+          checkPP = checkPassphrase(messageid, passphrase);
+          if(checkPP) {
+            plaintext = getMessage(messageid);
+            cout << "   From: " << sender << endl;
+            cout << "     To: " << receiver << endl;
+            cout << "  Title: " << title << endl;
+            cout << "Message: " << plaintext << endl;
+            deleteMessage(messageid);
+            
+            cout << "Press Enter to return to main menu...\n";
+            cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+            choice = "";
+            check = true;
+          } else {
+            cout << "bad passphrase..." << endl;
+            cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
               choice = "";
               check = true;            
-            }          
-          } else {
-            gfx.clearScreen();
-          }
+          }          
+          //} else {
+          //gfx.clearScreen();
+          // }
         }
 
       } else if (!choice.compare("4")){  // User chooses to log out
@@ -323,17 +324,34 @@ int main (int argc, char* argv[]) {
         gfx.clearScreen();
         messageCount = countMessages(username);
         senders = getSenders(username);
-        cout << "+-------------------------------------------------------------------------------+" << endl;
-        cout << "| GeeMail Messaging Platform: Main Menu                                         |" << endl;
-        cout << "+-------------------------------------------------------------------------------+" << endl;
-    
-        cout << "Welcome " << username << ", ";
-        cout << "you have " << messageCount << " messages from the following users" << endl;
-        cout << "-----------------------" << endl;
-        for (int i = 0; i < senders.size(); i++) {
-          cout << "  " << senders[i] << endl;
-        }    
-        cout << "-----------------------" << endl;
+        receiver = username;
+        cout << "+--------------------------------------------------------------+" << endl;
+        cout << "| GeeMail Messaging Platform: Main Menu                        |" << endl;
+        cout << "+--------------------------------------------------------------+" << endl;    
+        cout << "| Welcome " << username << ", ";
+        cout << "you have " << messageCount << left << " messages " << right << setw(27)<< "|" << endl;
+        cout << "+--------------------------------------------------------------+" << endl;    
+        cout << "+-------------------------------------------------------------------------------------------------------+" << endl;
+        cout << "|    SENDER    |  MESSAGE SENT DATE TIME  |  MESSAGE READ DATE TIME  |  STATUS  |     SUBJECT TITLE     |" << endl;
+        cout << "+-------------------------------------------------------------------------------------------------------+" << endl;
+                
+        // messages = getMessages(sender, receiver);
+        messages = getAllMessages(receiver);
+        
+        for (i = 0; i < messages.size(); i++) {
+          split(temp, messages[i], is_any_of("\t"));
+          if (temp[3].compare("0")) {
+            // tmp = "read " + temp[3];
+            tmp = temp[3];
+            status = "read";
+          } else {
+            // tmp = "not read";
+            tmp = "          -";
+            status = "not read";
+          }
+          cout << left << "| " <<  setw(12) << temp[1] << " | " << setw(24) << temp[2] << " | "<< setw(24) << tmp << " | " << setw(8) << status << " | " << setw(22) << temp[4] << right << "|" << endl;
+        }
+        cout << "+-------------------------------------------------------------------------------------------------------+" << endl;
         cout << "\nWould you like to read or write a message?" << endl;
         cout << "[1] Read Message" << endl;
         cout << "[2] Write Message" << endl;
