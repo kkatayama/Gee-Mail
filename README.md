@@ -6,17 +6,10 @@ A secure asynchronous (same-machine) message platform
 >###Install Libraries
 >sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils<br >
 
->###Compile
->g++ -std=c++11 -I/usr/include/cryptopp \*.cpp cryptogm/\*.cpp GeeMail/\*.cpp GraphicEngine/\*.cpp -lcryptopp -lsqlite3 -o gee-mail
-
 #osx
 >###Install Libraries
->brew install boost
-
+>brew install boost<br />
 >brew install cryptopp
-
->###Complie
->g++ -std=c++11 -I/usr/local/include/cryptopp \*.cpp cryptogm/\*.cpp GeeMail/\*.cpp GraphicEngine/\*.cpp -lcryptopp -lsqlite3 -o gee-mail
 
 #docs
 >https://github.com/iwongu/sqlite3pp<br />
