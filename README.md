@@ -13,9 +13,9 @@ A secure asynchronous (same-machine) message platform
 
 #compile and run
 ```cpp
-make
+$ make
 
-./gee-mail
+$ ./gee-mail
 
 *********************************************************************************
 * CPEG-676 Secure Systems: Project 4: Gee-Mail                                  *
