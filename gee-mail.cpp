@@ -25,7 +25,7 @@ int main (int argc, char* argv[]) {
   string choice = "";
   string pass = "";
   bool logged_in=false;
-  bool check;
+  bool check = false;
   int checkRegister;
 
   // Read or Write Messages
@@ -86,7 +86,7 @@ int main (int argc, char* argv[]) {
         }
         choice = "";
       
-      } else if (!choice.compare("3")) {
+      } else if (!choice.compare("3")) { // User choses to QUIT
         running = false;
         break;
       } else {
@@ -183,9 +183,6 @@ int main (int argc, char* argv[]) {
             choice = "";
             check = true;            
           }          
-          // } else {
-          // gfx.clearScreen();
-          // }
         }
             
       } else if (!choice.compare("2")) { // User chooses to WRITE MESSAGE
