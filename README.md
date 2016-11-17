@@ -11,9 +11,27 @@ A secure asynchronous (same-machine) message platform
 >brew install boost<br />
 >brew install cryptopp
 
-#docs
->https://github.com/iwongu/sqlite3pp<br />
->https://cryptopp.com/wiki/Advanced_Encryption_Standard
+#compile and run
+```cpp
+make
+
+./gee-mail
+
+*********************************************************************************
+* CPEG-676 Secure Systems: Project 4: Gee-Mail                                  *
+*********************************** Authors *************************************
+* Alparslan Sari                                                                *
+* Kaoru (Teddy) Katayama                                                        *
+* Pengcheng (Kevin) Zhou                                                        *
+*********************************************************************************
++-------------------------------------------------------------------------------+
+| GeeMail Messaging Platform: Welcome Page                                      |
++-------------------------------------------------------------------------------+
+Would you like to login or register a new user?
+[1] Login
+[2] Register
+[3] Quit
+```
 
 #GeeMail API
 
