@@ -1,6 +1,9 @@
 # Gee-Mail
 A secure asynchronous (same-machine) message platform
-
+All passwords are hashed (sha256) + salted + stretched
+All messages are encrypted with AES-256-CFB_MODE and passphrase is hashed + salted + stretched
+For now, we have left our gee-mail binary in this repo for ease of use purposes.  We know this 
+not good practice; however, we want to make sure other groups can run our code without dependency issues.
 
 #ubuntu (cloud 9)
 >###Install Libraries
@@ -37,6 +40,12 @@ Would you like to login or register a new user?
 ```
 
 #GeeMail API
+
+##Sqlite Database Tables
+```bash
+users: |username|password|attempts|
+messages: |messageid|sender|receiver|title|message|writetime|readtime|passphrase|
+```
 
 ##Helper Functions
 ```c++
