@@ -1,14 +1,7 @@
 #include <boost/algorithm/string.hpp>
-#include <algorithm>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
-#include <stdio.h>
-#include <cstdlib>
-#include <string>
 #include <vector>
-#include <thread>
-#include <chrono>
 #include "GraphicEngine/GraphicEngine.h"
 #include "GeeMail/geemail.h"
 
