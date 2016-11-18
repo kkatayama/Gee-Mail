@@ -2,8 +2,7 @@
 A secure asynchronous (same-machine) message platform<br />
 All passwords are hashed (sha256) + salted + stretched<br />
 All messages are encrypted with AES-256-CFB_MODE and passphrase is hashed + salted + stretched<br />
-For now, we have left our gee-mail binary in this repo for ease of use purposes.  We know this 
-not good practice; however, we want to make sure other groups can run our code without dependency issues. <br /><br />
+<br /><br />
 Test user<br />
 ```javascript
 username: andy

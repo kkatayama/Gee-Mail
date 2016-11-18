@@ -8,7 +8,7 @@
 using namespace std;
 using namespace boost;
 
-int main (int argc, char* argv[]) {
+int main () {
   bool running = true;
   
   // Login or Register
