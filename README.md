@@ -12,11 +12,13 @@ password: #novo#ninja#
 #ubuntu (cloud 9)
 >###Install Libraries
 >sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils<br >
+>git clone https://github.com/kkatayama/Gee-Mail.git<br />
 
 #osx
 >###Install Libraries
 >brew install boost<br />
 >brew install cryptopp
+>git clone https://github.com/kkatayama/Gee-Mail.git<br />
 
 #compile and run
 ```cpp
