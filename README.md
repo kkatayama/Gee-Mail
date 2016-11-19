@@ -17,7 +17,7 @@ password: #novo#ninja#
 #osx
 >###Install Libraries
 >brew install boost<br />
->brew install cryptopp
+>brew install cryptopp<br />
 >git clone https://github.com/kkatayama/Gee-Mail.git<br />
 
 #compile and run
