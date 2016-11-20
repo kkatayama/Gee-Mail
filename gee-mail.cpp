@@ -319,7 +319,7 @@ int main () {
         cout << "| GeeMail Messaging Platform: Main Menu                        |" << endl;
         cout << "+--------------------------------------------------------------+" << endl;    
         cout << "| Welcome " << username << ", ";
-        cout << "you have " << messageCount << left << " messages " << right << setw(32-username.length())<< "|" << endl;
+        cout << "you have " << messageCount << left << " messages " << right << setw(33-username.length()-to_string(messageCount).length())<< "|" << endl;
         cout << "+--------------------------------------------------------------+" << endl;    
         cout << "+-------------------------------------------------------------------------------------------------------+" << endl;
         cout << "|    SENDER    |  MESSAGE SENT DATE TIME  |  MESSAGE READ DATE TIME  |  STATUS  |     SUBJECT TITLE     |" << endl;
