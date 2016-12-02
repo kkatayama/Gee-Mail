@@ -9,6 +9,14 @@ username: andy
 password: #novo#ninja#
 ```
 
+Test user passphrases for emails from 3 users<br />
+```javascript
+teddy | secret
+alp   | alparslan
+kevin | kevinzh
+```
+
+
 #ubuntu (cloud 9)
 >###Install Libraries
 >sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils<br >
