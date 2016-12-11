@@ -34,8 +34,9 @@ string* encrypt(string plaintext, string passphrase) {
   /*********************************/
   byte key[ AES::MAX_KEYLENGTH ];
   //  prng.GenerateBlock(key, sizeof(key));
-  memcpy(key, passphrase.c_str(), AES::MAX_KEYLENGTH);
 
+  memcpy(key, passphrase.c_str(), AES::MAX_KEYLENGTH);
+  
   byte iv[ AES::BLOCKSIZE ];
   prng.GenerateBlock(iv, sizeof(iv));
 
