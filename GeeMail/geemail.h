@@ -4,6 +4,7 @@
 // Helper Functions
 std::string getTime();
 int getChoice();
+void checkDB();
 
 // Login and Registraion
 bool check_password(std::string pass);
