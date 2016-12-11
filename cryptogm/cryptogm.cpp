@@ -1,24 +1,36 @@
+#include <boost/algorithm/string.hpp>
 #include <iostream>
+#include <string>
 #include "aes.h"
 #include "hex.h"
+#include "sha.h"
 #include "modes.h"
 #include "osrng.h"
-#include "sha256.h"
 #include "filters.h"
 #include "cryptogm.h"
 
 using namespace std;
 using namespace CryptoPP;
 
+string gen_hash(string data) {
+  string digest;
+  string out;
+  CryptoPP::SHA256 hash;
+
+  StringSource ss(data, true, new HashFilter(hash, new HexEncoder(new StringSink(digest))));
+  boost::to_lower(digest);
+  return digest;
+}
+
 string secure_hash(string secret, string salt, int  stretch) {
   int i = 0;
   string hash = "0";
-  string psalt = sha256(secret + salt);
+  string psalt = gen_hash(secret + salt);
 
-  // cout << "psalt  : " << psalt << endl;
   for (i = 0; i < stretch; i++) {
-    hash = sha256(hash + psalt);
+    hash = gen_hash(hash + psalt);
   }
+  cout << "hash  : " << hash << endl;
   return hash;
 }
 
@@ -63,9 +75,10 @@ string* encrypt(string plaintext, string passphrase) {
     e.SetKeyWithIV(key, sizeof(key), iv);
     StringSource(plaintext, true, new StreamTransformationFilter(e, new StringSink(cipher)));
       
-  } catch(const Exception& e) {
+  } catch(const Exception &e) {
     cerr << e.what() << endl;
-    exit(1);
+    // exit(1);
+    throw;
   }
   encoded.clear();
   StringSource(cipher, true, new HexEncoder(new StringSink(encoded)));
@@ -120,9 +133,10 @@ string decrypt(string ciphertext, string key_str, string iv_str) {
     StringSource ss(cipher_raw, true, new StreamTransformationFilter(d, new StringSink(decrypted_text)));
 
   }
-  catch( Exception& e ) {
+  catch( Exception &e ) {
     std::cerr << e.what() << std::endl;
-    exit(1);
+    // exit(1);
+    throw;
   }
 
   return decrypted_text;  

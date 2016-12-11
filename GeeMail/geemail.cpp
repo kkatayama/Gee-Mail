@@ -13,7 +13,6 @@
 #include "aes.h"
 #include "hex.h"
 #include "filters.h"
-#include "../cryptogm/sha256.h"
 #include "../cryptogm/cryptogm.h"
 #include "../sqlite3pp/sqlite3pp.h"
 
@@ -70,8 +69,12 @@ bool check_password(string pass){
   string pw;
 
   passfile.open("cryptogm/top_1000000.txt");
-  while (getline (passfile, pw)) {
-    passwords.push_back(pw);
+  if (passfile) {
+    while (getline (passfile, pw)) {
+      passwords.push_back(pw);
+    }    
+  } else {
+    cout << "password file could not be loaded..." << endl;
   }
     
   if (find(passwords.begin(), passwords.end(), pass) != passwords.end()) {
@@ -181,6 +184,7 @@ bool userLogin(string username, string password) {
     }
   } catch (std::exception &ex) {
     cout << ex.what() << endl;
+    // throw;
   }
   this_thread::sleep_for (std::chrono::seconds(3));
   return false;
@@ -352,6 +356,7 @@ string getMessage(string messageid){
 
 void writeMessage(string username, string receiver, string title, string message, string writetime, string readtime, string passphrase) {
   string *cipherdata = new string[3];
+  string wtf;
   string ciphertext;
   string key;
   string iv;
@@ -366,7 +371,7 @@ void writeMessage(string username, string receiver, string title, string message
       key = cipherdata[1];
       iv = cipherdata[0];  
 
-      string wtf = iv+ciphertext;
+      wtf = iv+ciphertext;
   
       command cmd(db, "INSERT INTO messages (sender, receiver, title, message, writetime, readtime, passphrase) VALUES (:send, :rcv, :ttl, :msg, :write, :read, :pass)");
       cmd.bind(":send", username, nocopy);
@@ -381,6 +386,8 @@ void writeMessage(string username, string receiver, string title, string message
   } catch (std::exception &ex) {
     cout << ex.what() << endl;
   }
+
+  delete[] cipherdata;
   return;
 }
 

@@ -43,7 +43,7 @@ int main () {
   vector <string> msgData;
   vector <string> temp;
 
-  checkDB();  // Check if database file, users table, and messages table exists.  Create if needed
+  checkDB();  // Check if users table and messages table exists.  Create if needed
 
   while(running) {
     /********************************/
