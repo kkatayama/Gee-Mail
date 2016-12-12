@@ -1,3 +1,4 @@
+#include <boost/timer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <iomanip>
@@ -223,7 +224,9 @@ int main () {
             cout << "| passphrase: " << passphrase << endl;
             cout << "|  timestamp: " << timestamp << endl;
 
+            boost::timer t;
             writeMessage(username, receiver, title, message, timestamp, "0", passphrase);
+            cout << "took: " << t.elapsed();
             cout << "\nMessage successfully written." << endl;
             cout << "Please remember your passphrase." << endl;
             cout << "\nPress Enter to return to main menu...\n";

@@ -65,16 +65,20 @@ void checkDB(){
 
 bool check_password(string pass){
   vector <string> passwords;
+  bool hasUpper = false;
+  bool hasLower = false;
+  bool hasDigit = false;
   ifstream passfile;
   string pw;
-
+  int i;
+  
   passfile.open("cryptogm/top_1000000.txt");
   if (passfile) {
     while (getline (passfile, pw)) {
       passwords.push_back(pw);
     }    
   } else {
-    cout << "password file could not be loaded..." << endl;
+    cout << "top 1000000 password file could not be loaded..." << endl;
   }
     
   if (find(passwords.begin(), passwords.end(), pass) != passwords.end()) {
@@ -85,6 +89,31 @@ bool check_password(string pass){
     cout << "password too short" << endl;
     return false;
   }
+
+  for (i = 0; i < pass.length(); i++){
+    if (islower(pass[i])) {
+      hasLower = true;
+    }
+    if (isupper(pass[i])) {
+      hasUpper = true;
+    }
+    if (isdigit(pass[i])) {
+      hasDigit = true;
+    }
+  }
+  if (!hasLower) {
+    cout << "password must contain at least 1 lowercase letter" << endl;
+    return false;
+  }
+  if (!hasUpper) {
+    cout << "password must contain at least 1 uppercase letter" << endl;
+    return false;
+  }
+  if (!hasDigit) {
+    cout << "password must contain at least 1 digit letter" << endl;
+    return false;
+  }
+  
   return true;
 }
 
@@ -116,7 +145,7 @@ int userRegister(string username, string password) {
       cmd.bind(":attempts", "0", nocopy);
       cmd.execute();
       
-      cout << "user created!"<< endl;
+      cout << "user created!" << endl;
       this_thread::sleep_for (std::chrono::seconds(1));
     }
   } catch (std::exception &ex) {
@@ -339,6 +368,7 @@ string getMessage(string messageid){
       cmd.execute();    
   
       byte kt[ AES::MAX_KEYLENGTH ];
+      key = secure_hash(key, "┌∩┐(◣_◢)┌∩┐", 100000);
       memcpy(kt, key.c_str(), AES::MAX_KEYLENGTH);
 
       key.clear();
@@ -366,9 +396,9 @@ void writeMessage(string username, string receiver, string title, string message
     transaction xct(db, true);
     {
       passphrase = secure_hash(passphrase, "┌∩┐(◣_◢)┌∩┐", 1000);
-      cipherdata = encrypt(message, passphrase);
+      key = secure_hash(passphrase, "┌∩┐(◣_◢)┌∩┐", 100000);
+      cipherdata = encrypt(message, key);
       ciphertext = cipherdata[2];
-      key = cipherdata[1];
       iv = cipherdata[0];  
 
       wtf = iv+ciphertext;

@@ -30,7 +30,6 @@ string secure_hash(string secret, string salt, int  stretch) {
   for (i = 0; i < stretch; i++) {
     hash = gen_hash(hash + psalt);
   }
-  cout << "hash  : " << hash << endl;
   return hash;
 }
 
