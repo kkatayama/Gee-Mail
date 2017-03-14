@@ -72,7 +72,6 @@ int getChoice()
 ```
 >returns int only if user inputs an integer
 
-<br />
 ## Login and Registraion
 ```c++
 bool check_password(string pass)
@@ -93,7 +92,6 @@ bool userLogin(string username, string pass)
 >returns true if login successful<br />
 >returns false if login failed
 
-<br />
 ## Read, Write, and Delete Messages
 ```c++
 int countMessages(string receiver)
@@ -133,7 +131,6 @@ deleteMessage(string messageid)
 ```
 >deletes a message given its id
 
-<br />
 ## Backend Functions
 ```c++
 string secure_hash(string secret, string salt, int stretch);
