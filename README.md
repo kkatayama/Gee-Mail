@@ -17,18 +17,18 @@ kevin | kevinzh
 ```
 
 
-#ubuntu (cloud 9)
+# ubuntu (cloud 9)
 >###Install Libraries
 >sudo apt-get install libcrypto++-dev libcrypto++-doc libcrypto++-utils<br >
 >git clone https://github.com/kkatayama/Gee-Mail.git<br />
 
-#osx
+# osx
 >###Install Libraries
 >brew install boost<br />
 >brew install cryptopp<br />
 >git clone https://github.com/kkatayama/Gee-Mail.git<br />
 
-#compile and run
+# compile and run
 ```cpp
 $ make
 
@@ -53,15 +53,15 @@ Would you like to login or register a new user?
 [3] Quit
 ```
 
-#GeeMail API
+# GeeMail API
 
-##Sqlite Database Tables
+## Sqlite Database Tables
 ```bash
 users: |username|password|attempts|
 messages: |messageid|sender|receiver|title|message|writetime|readtime|passphrase|
 ```
 
-##Helper Functions
+## Helper Functions
 ```c++
 string getTime()
 ```
@@ -73,7 +73,7 @@ int getChoice()
 >returns int only if user inputs an integer
 
 <br />
-##Login and Registraion
+## Login and Registraion
 ```c++
 bool check_password(string pass)
 ```
@@ -94,7 +94,7 @@ bool userLogin(string username, string pass)
 >returns false if login failed
 
 <br />
-##Read, Write, and Delete Messages
+## Read, Write, and Delete Messages
 ```c++
 int countMessages(string receiver)
 ```
@@ -134,7 +134,7 @@ deleteMessage(string messageid)
 >deletes a message given its id
 
 <br />
-##Backend Functions
+## Backend Functions
 ```c++
 string secure_hash(string secret, string salt, int stretch);
 ```
