@@ -32,13 +32,15 @@ kevin | kevinzh
 > ### Install Libraries
 > brew install boost<br />
 > NO LONGER WORKS: brew install cryptopp<br />
-> wget https://github.com/weidai11/cryptopp/archive/refs/tags/CRYPTOPP_8_8_0.tar.gz
-> tar xvf cryptopp-CRYPTOPP_8_8_0.tar.gz
-> cd cryptopp-CRYPTOPP_8_8_0
-> make -j 8
-> sudo make install
-> cd ..
-> git clone https://github.com/kkatayama/Gee-Mail.git<br />
+> wget https://github.com/weidai11/cryptopp/archive/refs/tags/CRYPTOPP_8_8_0.tar.gz <br />
+> tar xvf cryptopp-CRYPTOPP_8_8_0.tar.gz <br />
+> cd cryptopp-CRYPTOPP_8_8_0 <br />
+> make -j 8 <br />
+> sudo make install <br />
+> cd .. <br />
+
+# ### Download Source
+> git clone https://github.com/kkatayama/Gee-Mail.git <br />
 
 # compile and run
 ```cpp
